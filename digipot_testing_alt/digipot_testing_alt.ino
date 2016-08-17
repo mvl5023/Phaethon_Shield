@@ -1,4 +1,5 @@
 /*   Sample code for controlling the AD5272 Digital Potentiometer over I2C
+ *    Using "word" datatype instead of an array of two bytes
  * 
  *   Michael Lipski
  *   AOPL
@@ -18,8 +19,7 @@ int resetPV = 27;
 
 unsigned int dpData;
 
-// Datatype "word" along with highByte() and lowByte() could be used instead of an array of two bytes, but this method is more portable
-byte dpCommand[2];    // [ MSByte, LSByte ]
+word dpCommand;
 
 String serialComm;
 String comm1;
@@ -47,18 +47,18 @@ void loop()
       dpData = comm1.toInt();
 
       // Generating two bytes to be sent to the digipot shift register, MSByte first
-      dpCommand[0] = (1024 + dpData) >> 8;
-      dpCommand[1] = dpData & 255;
+      dpCommand = 1024 + dpData;      
   
       Wire.beginTransmission(0x2C);
-      Wire.write(dpCommand, 2);
+      Wire.write(highByte(dpCommand));
+      Wire.write(lowByte(dpCommand));
       Wire.endTransmission();
 
       
       Serial.print("PV  ");
-      Serial.print(dpCommand[0], BIN);
+      Serial.print(highByte(dpCommand), BIN);
       Serial.print(' ');
-      Serial.println(dpCommand[1], BIN);
+      Serial.println(lowByte(dpCommand), BIN);
       
     }
     if(serialComm.substring(0, 6) == "setcpv")
@@ -67,18 +67,18 @@ void loop()
       dpData = comm1.toInt();
 
       // Generating two bytes to be sent to the digipot shift register, MSByte first
-      dpCommand[0] = (1024 + dpData) >> 8;
-      dpCommand[1] = dpData & 255;
-
-      Wire.beginTransmission(0x2F);
-      Wire.write(dpCommand, 2);
-      Wire.endTransmission(); 
+      dpCommand = 1024 + dpData;      
+  
+      Wire.beginTransmission(0x2C);
+      Wire.write(highByte(dpCommand));
+      Wire.write(lowByte(dpCommand));
+      Wire.endTransmission();
 
       
-      Serial.print("CPV ");
-      Serial.print(dpCommand[0], BIN);
+      Serial.print("PV  ");
+      Serial.print(highByte(dpCommand), BIN);
       Serial.print(' ');
-      Serial.println(dpCommand[1], BIN);
+      Serial.println(lowByte(dpCommand), BIN);
       
     }
   }

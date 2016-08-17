@@ -19,6 +19,11 @@ void setup()
 {
   Serial.begin(9600);
 
+  // Memory efficient version of pin initialization, for Mega2560 only
+  DDRA |= B11001100;    // Sets Mega 2560 pins 24, 25, 28, 29 as outputs
+  PORTA &= B00110011;   // Sets 24, 25, 28, 29 LOW
+  
+  /*
   // Initializes the proper pins as outputs and ensures that they are at logic low
   pinMode(cpvSMU, OUTPUT);
   pinMode(cpvTIA, OUTPUT);
@@ -28,6 +33,7 @@ void setup()
   digitalWrite(cpvTIA, LOW);
   digitalWrite(pvSMU, LOW);
   digitalWrite(pvTIA, LOW);
+  */
 }
 
 void loop() 
